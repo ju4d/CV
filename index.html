@@ -6,7 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CV Juan Jose Rodriguez Zarate</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;700&display=swap');
+
+        :root {
+            --bg: #0a0c0a;
+            --bg-panel: #0f1310;
+            --bg-bar: #141814;
+            --fg: #c7d2c4;
+            --fg-dim: #6d786c;
+            --fg-faint: #444d43;
+            --accent: #7fe6a8;
+            --accent-soft: rgba(127, 230, 168, 0.12);
+            --amber: #e0a458;
+            --border: #23291f;
+            --border-soft: #1a1f19;
+            font-size: 16px;
+        }
 
         * {
             margin: 0;
@@ -14,833 +29,1371 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Rajdhani', sans-serif;
-            background: #0a0e27;
-            color: #00ff9f;
+        html {
+            scroll-behavior: smooth;
+        }
+
+        html {
             overflow-x: hidden;
         }
 
-        .grid-bg {
+        body {
+            font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        #tentacleCanvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background:
-                linear-gradient(90deg, rgba(0, 255, 159, 0.03) 1px, transparent 1px),
-                linear-gradient(rgba(0, 255, 159, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
             z-index: 0;
-        }
-
-        .scanline {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(transparent 50%, rgba(255, 0, 255, 0.05) 50%);
-            background-size: 100% 4px;
-            animation: scan 8s linear infinite;
             pointer-events: none;
-            z-index: 100;
         }
 
-        @keyframes scan {
-            0% {
-                transform: translateY(0);
-            }
+        /* subtle static texture, no motion, no rainbow scanlines */
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            background-image:
+                linear-gradient(rgba(127, 230, 168, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(127, 230, 168, 0.015) 1px, transparent 1px);
+            background-size: 3px 3px, 3px 3px;
+            mix-blend-mode: overlay;
+        }
 
-            100% {
-                transform: translateY(100vh);
-            }
+        .vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 51;
+            box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.65);
         }
 
         .language-switch {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 18px;
+            right: 18px;
             z-index: 101;
             display: flex;
-            gap: 10px;
-            background: rgba(10, 14, 39, 0.9);
-            border: 2px solid #00ff9f;
-            padding: 5px;
-            box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+            border: 1px solid var(--border);
+            background: var(--bg-panel);
+            border-radius: 3px;
+            overflow: hidden;
         }
 
         .lang-btn {
             background: transparent;
-            border: 2px solid #00ff9f;
-            color: #00ff9f;
-            padding: 10px 20px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 700;
+            border: none;
+            color: var(--fg-dim);
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .lang-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .lang-btn:hover::before {
-            left: 100%;
+            letter-spacing: 1px;
+            transition: all 0.2s;
         }
 
         .lang-btn:hover {
-            box-shadow: 0 0 15px #00ff9f;
-            text-shadow: 0 0 10px #00ff9f;
+            color: var(--fg);
+            background: rgba(127, 230, 168, 0.06);
         }
 
         .lang-btn.active {
-            background: #00ff9f;
-            color: #0a0e27;
-            box-shadow: 0 0 20px #00ff9f;
+            background: var(--accent);
+            color: #0a0c0a;
         }
 
-        .container {
+        .wrap {
             position: relative;
             z-index: 1;
-            max-width: 1200px;
+            max-width: 1120px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 32px 80px;
         }
 
-        header {
-            text-align: center;
-            padding: 60px 20px;
-            position: relative;
+        /* ---------- hero ---------- */
+
+        header.hero {
+            padding: 70px 0 20px;
         }
 
-        .photo-container {
+        .boot-line {
+            font-size: 0.8rem;
+            color: var(--fg-faint);
+            margin-bottom: 22px;
+        }
+
+        .boot-line .ok {
+            color: var(--accent);
+        }
+
+        #asciiStage {
+            width: 100%;
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            align-items: center;
+            margin: 0 0 28px;
+            min-height: 40px;
         }
 
-        .photo-frame {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            border: 3px solid #00ff9f;
-            box-shadow:
-                0 0 20px #00ff9f,
-                inset 0 0 20px rgba(0, 255, 159, 0.2);
-            padding: 5px;
-            background: rgba(10, 14, 39, 0.9);
-            clip-path: polygon(0 10%, 10% 0, 90% 0, 100% 10%,
-                    100% 90%, 90% 100%, 10% 100%, 0 90%);
-            animation: photoGlow 3s infinite alternate;
+        #asciiCanvas {
+            image-rendering: pixelated;
+            opacity: 0.9;
         }
 
-        @keyframes photoGlow {
-            0% {
-                box-shadow: 0 0 20px #00ff9f, inset 0 0 20px rgba(0, 255, 159, 0.2);
-            }
-
-            50% {
-                box-shadow: 0 0 30px #ff00ff, inset 0 0 30px rgba(255, 0, 255, 0.2);
-            }
-
-            100% {
-                box-shadow: 0 0 20px #00ff9f, inset 0 0 20px rgba(0, 255, 159, 0.2);
-            }
+        h1.name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--fg);
+            letter-spacing: -0.5px;
         }
 
-        .profile-photo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter:
-                contrast(1.2) brightness(1.1) saturate(1.3);
-            clip-path: polygon(0 10%, 10% 0, 90% 0, 100% 10%,
-                    100% 90%, 90% 100%, 10% 100%, 0 90%);
+        h1.name .caret {
+            display: inline-block;
+            width: 0.55em;
+            background: var(--accent);
+            color: var(--bg);
+            animation: blink 1s steps(1) infinite;
         }
 
-        .photo-glitch {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg,
-                    transparent 0%,
-                    rgba(0, 255, 159, 0.1) 45%,
-                    rgba(255, 0, 255, 0.1) 55%,
-                    transparent 100%);
-            animation: photoScan 4s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes photoScan {
-            0% {
-                transform: translateY(-100%);
-            }
-
-            100% {
-                transform: translateY(100%);
+        @media (prefers-reduced-motion: reduce) {
+            h1.name .caret {
+                animation: none;
+                opacity: 1;
             }
         }
 
-        .glitch {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            position: relative;
-            text-shadow:
-                0 0 10px #00ff9f,
-                0 0 20px #00ff9f,
-                0 0 30px #00ff9f,
-                0 0 40px #ff00ff,
-                0 0 70px #ff00ff,
-                0 0 80px #ff00ff;
-            animation: glitch 3s infinite;
-        }
-
-        @keyframes glitch {
+        @keyframes blink {
 
             0%,
-            90%,
+            49% {
+                opacity: 1;
+            }
+
+            50%,
             100% {
-                transform: translate(0);
-            }
-
-            92% {
-                transform: translate(-2px, 2px);
-            }
-
-            94% {
-                transform: translate(2px, -2px);
-            }
-
-            96% {
-                transform: translate(-2px, -2px);
-            }
-
-            98% {
-                transform: translate(2px, 2px);
+                opacity: 0;
             }
         }
 
-        .subtitle {
-            font-size: 1.5rem;
-            color: #ff00ff;
-            margin-top: 10px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
+        .role-line {
+            margin-top: 8px;
+            color: var(--amber);
+            font-size: 0.95rem;
         }
 
-        .neon-border {
-            border: 2px solid #00ff9f;
-            box-shadow:
-                0 0 10px #00ff9f,
-                inset 0 0 10px rgba(0, 255, 159, 0.1);
-            background: rgba(10, 14, 39, 0.8);
-            padding: 30px;
-            margin: 30px 0;
+        .role-line::before {
+            content: '// ';
+            color: var(--fg-faint);
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 18px;
+            font-size: 0.72rem;
+            color: var(--fg-dim);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 3px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent);
+        }
+
+        /* ---------- terminal window blocks ---------- */
+
+        .term {
+            margin: 44px 0;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: rgba(15, 19, 16, 0.5);
+            backdrop-filter: blur(40px) saturate(1.2);
+            -webkit-backdrop-filter: blur(40px) saturate(1.2);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .term.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .term {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
+
+        .term-bar {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 14px;
+            background: rgba(20, 24, 20, 0.45);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .term-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .term-path {
+            margin-left: auto;
+            font-size: 0.72rem;
+            color: var(--fg-faint);
+        }
+
+        .term-body {
+            padding: 26px 28px 30px;
+        }
+
+        .cmd {
+            font-size: 0.85rem;
+            color: var(--fg-dim);
+            margin-bottom: 18px;
+        }
+
+        .cmd::before {
+            content: 'guest@jjrz ~ $ ';
+            color: var(--fg-faint);
+        }
+
+        .cmd .arg {
+            color: var(--accent);
+        }
+
+        h2.title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--fg);
+            margin-bottom: 4px;
+        }
+
+        .lede {
+            color: var(--fg-dim);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        p.prose {
+            color: var(--fg);
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+        }
+
+        p.prose:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ---------- timeline (experience) ---------- */
+
+        .timeline {
+            list-style: none;
             position: relative;
+            padding-left: 22px;
         }
 
-        .neon-border::before {
+        .timeline::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #00ff9f, #ff00ff, #00ff9f);
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s;
+            left: 4px;
+            top: 6px;
+            bottom: 6px;
+            width: 1px;
+            background: var(--border);
         }
 
-        .neon-border:hover::before {
-            opacity: 0.3;
-        }
-
-        h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            color: #ffffff;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 10px #c3fffb;
-        }
-
-        .section-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .info-card {
-            background: rgba(255, 0, 255, 0.05);
-            border-left: 3px solid #ff00ff;
-            padding: 20px;
-            transition: all 0.3s;
-        }
-
-        .info-card:hover {
-            background: rgba(255, 0, 255, 0.1);
-            transform: translateX(10px);
-            box-shadow: -5px 0 15px rgba(255, 0, 255, 0.3);
-        }
-
-        .info-card h3 {
-            color: #00ff9f;
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .info-card p,
-        .info-card li {
-            color: #a8b2d1;
-            line-height: 1.8;
-            font-size: 1.1rem;
-        }
-
-        .skill-bar {
-            background: rgba(0, 255, 159, 0.1);
-            height: 30px;
-            margin: 15px 0;
+        .timeline-item {
             position: relative;
+            padding-bottom: 28px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 5px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--bg-panel);
+            border: 2px solid var(--accent);
+        }
+
+        .timeline-role {
+            font-weight: 700;
+            color: var(--fg);
+            font-size: 0.95rem;
+        }
+
+        .timeline-meta {
+            color: var(--fg-dim);
+            font-size: 0.78rem;
+            margin: 3px 0 10px;
+        }
+
+        .timeline-meta .co {
+            color: var(--amber);
+        }
+
+        .timeline-item ul {
+            list-style: none;
+        }
+
+        .timeline-item li {
+            color: var(--fg-dim);
+            font-size: 0.87rem;
+            padding-left: 16px;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item li::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: var(--fg-faint);
+        }
+
+        /* ---------- skills as ascii meters ---------- */
+
+        .meter-row {
+            display: grid;
+            grid-template-columns: 200px 1fr 34px;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.82rem;
+            margin-bottom: 10px;
+        }
+
+        .meter-label {
+            color: var(--fg);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .meter-bar {
+            color: var(--fg-faint);
+            letter-spacing: -1px;
+            white-space: pre;
             overflow: hidden;
         }
 
-        .skill-bar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background: linear-gradient(90deg, #00ff9f, #ff00ff);
-            animation: loading 2s ease-out forwards;
+        .meter-bar .fill {
+            color: var(--accent);
         }
 
-        .skill-bar[data-skill="90"]::before {
-            width: 90%;
+        .meter-pct {
+            color: var(--fg-dim);
+            text-align: right;
         }
 
-        .skill-bar[data-skill="85"]::before {
-            width: 85%;
-        }
-
-        .skill-bar[data-skill="75"]::before {
-            width: 75%;
-        }
-
-        .skill-bar[data-skill="70"]::before {
-            width: 70%;
-        }
-
-        .skill-bar[data-skill="65"]::before {
-            width: 65%;
-        }
-
-        .skill-bar[data-skill="60"]::before {
-            width: 60%;
-        }
-
-        @keyframes loading {
-            from {
-                width: 0;
+        @media (max-width: 560px) {
+            .meter-row {
+                grid-template-columns: 128px 1fr 30px;
+                font-size: 0.68rem;
             }
         }
 
-        .skill-label {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #fff;
-            font-weight: 600;
-            z-index: 1;
-            text-shadow: 0 0 5px #000;
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .contact-item {
-            text-align: center;
-            padding: 20px;
-            background: rgba(0, 255, 159, 0.05);
-            border: 1px solid #00ff9f;
-            transition: all 0.3s;
-        }
-
-        .contact-item:hover {
-            background: rgba(0, 255, 159, 0.15);
-            box-shadow: 0 0 20px rgba(0, 255, 159, 0.5);
-            transform: scale(1.05);
-        }
-
-        .contact-item a {
-            color: #00ff9f;
-            text-decoration: none;
-            font-size: 1.1rem;
-        }
-
-        ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        ul li::before {
-            content: '▹ ';
-            color: #ff00ff;
-            font-weight: bold;
-        }
+        /* ---------- projects ---------- */
 
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
         }
 
-        .project-card {
-            background: rgba(10, 14, 39, 0.6);
-            border: 2px solid #00ff9f;
-            padding: 25px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
+        .project {
+            border: 1px solid var(--border-soft);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.012);
+            padding: 16px 18px;
+            transition: border-color 0.2s, background 0.2s;
         }
 
-        .project-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg,
-                    transparent,
-                    rgba(0, 255, 159, 0.1),
-                    transparent);
-            transform: rotate(45deg);
-            transition: all 0.5s;
+        .project.full-width {
+            grid-column: 1 / -1;
         }
 
-        .project-card:hover::before {
-            left: 100%;
+        .project:hover {
+            border-color: var(--border);
+            background: rgba(127, 230, 168, 0.03);
         }
 
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow:
-                0 10px 30px rgba(0, 255, 159, 0.3),
-                0 0 50px rgba(255, 0, 255, 0.2);
-            border-color: #ff00ff;
-        }
-
-        .project-header {
+        .project-head {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 8px;
         }
 
-        .project-header h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: #00ff9f;
-            font-size: 1.3rem;
-            margin: 0;
-        }
-
-        .project-status {
-            font-size: 0.7rem;
-            padding: 5px 10px;
-            background: rgba(255, 0, 255, 0.2);
-            border: 1px solid #ff00ff;
-            color: #ff00ff;
+        .project-head h3 {
+            font-size: 0.92rem;
+            color: var(--fg);
             font-weight: 600;
-            letter-spacing: 1px;
+        }
+
+        .flag {
+            font-size: 0.65rem;
+            white-space: nowrap;
+            padding: 2px 6px;
+            border-radius: 2px;
+            border: 1px solid var(--border);
+            color: var(--fg-dim);
+        }
+
+        .flag.active {
+            color: var(--amber);
+            border-color: rgba(224, 164, 88, 0.35);
         }
 
         .project-desc {
-            color: #a8b2d1;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
+            color: var(--fg-dim);
+            font-size: 0.83rem;
+            margin-bottom: 12px;
         }
 
         .project-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
         .tag {
-            background: rgba(0, 255, 159, 0.1);
-            color: #00ff9f;
-            padding: 5px 12px;
-            font-size: 0.85rem;
-            border: 1px solid #00ff9f;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-        }
-
-        .project-links {
-            display: flex;
-            gap: 15px;
-            position: relative;
-            z-index: 1;
+            font-size: 0.68rem;
+            color: var(--fg-dim);
+            border: 1px solid var(--border-soft);
+            padding: 2px 7px;
+            border-radius: 2px;
         }
 
         .project-link {
-            color: #ff00ff;
+            font-size: 0.8rem;
+            color: var(--accent);
             text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-shadow: 0 0 5px #ff00ff;
         }
 
         .project-link:hover {
-            color: #00ff9f;
-            text-shadow: 0 0 10px #00ff9f;
-            transform: translateX(5px);
+            text-decoration: underline;
         }
 
-        @media (max-width: 768px) {
-            .glitch {
-                font-size: 2rem;
+        /* ---------- education ---------- */
+
+        .edu-item {
+            margin-bottom: 20px;
+        }
+
+        .edu-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .edu-item h3 {
+            font-size: 0.92rem;
+            color: var(--fg);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .edu-item .co {
+            color: var(--amber);
+            font-size: 0.82rem;
+        }
+
+        .edu-item .yr {
+            color: var(--fg-faint);
+            font-size: 0.78rem;
+        }
+
+        .edu-item ul {
+            list-style: none;
+            margin-top: 8px;
+        }
+
+        .edu-item li {
+            color: var(--fg-dim);
+            font-size: 0.85rem;
+            padding-left: 16px;
+            position: relative;
+            margin-bottom: 4px;
+        }
+
+        .edu-item li::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: var(--fg-faint);
+        }
+
+        /* ---------- contact ---------- */
+
+        .contact-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .contact-line {
+            display: flex;
+            gap: 14px;
+            font-size: 0.88rem;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-soft);
+        }
+
+        .contact-line:last-child {
+            border-bottom: none;
+        }
+
+        .contact-key {
+            width: 90px;
+            flex-shrink: 0;
+            color: var(--fg-faint);
+        }
+
+        .contact-line a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .contact-line a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-line span {
+            color: var(--fg);
+        }
+
+        footer {
+            text-align: center;
+            color: var(--fg-faint);
+            font-size: 0.72rem;
+            padding: 30px 0 10px;
+        }
+
+        @media (max-width: 600px) {
+            .wrap {
+                padding: 0 18px 80px;
             }
 
-            .subtitle {
-                font-size: 1rem;
+            h1.name {
+                font-size: 1.5rem;
             }
 
-            .neon-border {
-                padding: 20px;
+            .term-body {
+                padding: 20px 18px 24px;
             }
 
-            .language-switch {
-                top: 10px;
-                right: 10px;
-            }
-
-            .lang-btn {
-                padding: 8px 15px;
-                font-size: 0.8rem;
+            header.hero {
+                padding: 90px 0 10px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="grid-bg"></div>
-    <div class="scanline"></div>
+    <canvas id="tentacleCanvas"></canvas>
+    <div class="grain"></div>
+    <div class="vignette"></div>
 
     <div class="language-switch">
-        <button class="lang-btn active" onclick="changeLanguage('es')">ESP</button>
-        <button class="lang-btn" onclick="changeLanguage('en')">ENG</button>
+        <button class="lang-btn active" data-lang="es">ESP</button>
+        <button class="lang-btn" data-lang="en">ENG</button>
     </div>
 
-    <div class="container">
-        <header>
-            <div class="photo-container">
-                <div class="photo-frame">
-                    <img src="P_CV.jpg" alt="Profile photo" class="profile-photo">
-                    <div class="photo-glitch"></div>
-                </div>
-            </div>
-            <h1 class="glitch">Juan José Rodríguez Zarate</h1>
-            <p class="subtitle" data-es="Dev Full stack (fresher) | Cybersecurity (amateur)"
-                data-en="Full Stack Dev (fresher) | Cybersecurity (amateur)">Dev Full stack (fresher) | Cybersecurity
-                (amateur)</p>
+    <div class="wrap">
+        <header class="hero">
+            <p class="boot-line"><span class="ok">[ ok ]</span> <span data-es="sesión iniciada — cargando perfil.bin"
+                    data-en="session started — loading profile.bin">sesión iniciada — cargando perfil.bin</span></p>
+
+            <div id="asciiStage"><canvas id="asciiCanvas"></canvas></div>
+
+            <h1 class="name">Juan José Rodríguez Zárate<span class="caret">&nbsp;</span></h1>
+            <p class="role-line" data-es="Dev Full Stack (Jr) · Ciberseguridad (Jr)"
+                data-en="Full Stack Dev (Jr) · Cybersecurity (Jr)">Dev Full Stack (Jr) · Ciberseguridad (Jr)</p>
+
         </header>
 
-        <div class="neon-border">
-            <h2 data-es="// Proyectos" data-en="// Projects">// Proyectos</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-header">
-                        <h3 data-es="Gestión de desperdicios e inventario (Tlaix)"
-                            data-en="Waste and Inventory Management (Tlaix)">Gestión de desperdicios e inventario
-                            (Tlaix)</h3>
-                        <span class="project-status" data-es="ACTIVO" data-en="ACTIVE">ACTIVO</span>
-                    </div>
-                    <p class="project-desc"
-                        data-es="Aplicación que permite gestionar el inventario y desperdicios de restaurantes y buffets de manera eficiente. Incluye funcionalidades de seguimiento, reportes, analíticas y predicciones de consumo usando IA."
-                        data-en="Application that efficiently manages inventory and waste for restaurants and buffets. Includes tracking, reporting, analytics, and AI-powered consumption predictions.">
-                        Aplicación que permite gestionar el inventario y desperdicios de restaurantes y buffets de
-                        manera eficiente. Incluye funcionalidades de seguimiento, reportes, analíticas y predicciones de
-                        consumo usando IA.
-                    </p>
-                    <div class="project-tags">
-                        <span class="tag">Laravel Blade (PHP)</span>
-                        <span class="tag">IBM cloud</span>
-                        <span class="tag">MySQL</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/ju4d/Tlaix-v2" class="project-link">GitHub →</a>
-                    </div>
-                </div>
+        <!-- chapter 1: who -->
+        <section class="term">
+            <div class="term-bar">
+                <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+                <span class="term-path">~/cv/about.md</span>
+            </div>
+            <div class="term-body">
+                <p class="cmd">cat <span class="arg">about.md</span></p>
+                <p class="prose"
+                    data-es="Desarrollador Full Stack Jr y apasionado de la Ciberseguridad Jr con formación en Ingeniería Informática. Experiencia práctica en desarrollo de aplicaciones web (React, Node.js, PHP/Laravel), integraciones con IA, despliegue y orquestación de contenedores con Docker y Kubernetes, y pruebas de pentesting (HackTheBox, TryHackMe)."
+                    data-en="Junior Full Stack Developer and junior cybersecurity enthusiast with a background in Computer Engineering. Hands-on experience building web applications (React, Node.js, PHP/Laravel), integrating AI, deploying and orchestrating containers with Docker and Kubernetes, and pentesting labs (HackTheBox, TryHackMe).">
+                    Desarrollador Full Stack Jr y apasionado de la Ciberseguridad Jr con formación en Ingeniería
+                    Informática. Experiencia práctica en desarrollo de aplicaciones web (React, Node.js,
+                    PHP/Laravel), integraciones con IA, despliegue y orquestación de contenedores con Docker y
+                    Kubernetes, y pruebas de pentesting (HackTheBox, TryHackMe).
+                </p>
+                <p class="prose"
+                    data-es="Dominio avanzado de sistemas Linux, redes y automatización en Python. Mentalidad proactiva y orientada a resultados: busco una posición como Desarrollador Full Stack / Backend Jr o Analista de Ciberseguridad Jr para resolver problemas complejos y fortalecer la fiabilidad y seguridad de las aplicaciones."
+                    data-en="Advanced knowledge of Linux systems, networking and Python automation. Proactive and results-driven: I'm looking for a role as Junior Full Stack / Backend Developer or Junior Cybersecurity Analyst to solve complex problems and strengthen the reliability and security of the software I touch.">
+                    Dominio avanzado de sistemas Linux, redes y automatización en Python. Mentalidad proactiva y
+                    orientada a resultados: busco una posición como Desarrollador Full Stack / Backend Jr o
+                    Analista de Ciberseguridad Jr para resolver problemas complejos y fortalecer la fiabilidad y
+                    seguridad de las aplicaciones.
+                </p>
+            </div>
+        </section>
 
-                <div class="project-card">
-                    <div class="project-header">
-                        <h3 data-es="Becas PEES (UDG)" data-en="PEES Scholarships (UDG)">Becas PEES (UDG)</h3>
-                        <span class="project-status" data-es="ACTIVO" data-en="ACTIVE">ACTIVO</span>
-                    </div>
-                    <p class="project-desc"
-                        data-es="Plataforma web para la gestión integral de becas estudiantiles. Funcionalidades incluyen solicitud, seguimiento, administración y reportes. Así como un sistema de recomendaciones basados en un chatbot de IA."
-                        data-en="Web platform for comprehensive student scholarship management. Features include application, tracking, administration, and reports. Also includes an AI chatbot-based recommendation system.">
-                        Plataforma web para la gestión integral de becas estudiantiles. Funcionalidades incluyen
-                        solicitud, seguimiento, administración y reportes. Así como un sistema de recomendaciones
-                        basados en un chatbot de IA.
-                    </p>
-                    <div class="project-tags">
-                        <span class="tag">React</span>
-                        <span class="tag">PHP</span>
-                        <span class="tag">Llama (Meta AI)</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/EduardoGMora/BecasCGSU-Back" class="project-link">GitHub →</a>
-                    </div>
-                </div>
+        <!-- chapter 2: journey -->
+        <section class="term">
+            <div class="term-bar">
+                <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+                <span class="term-path">~/cv/career.log</span>
+            </div>
+            <div class="term-body">
+                <p class="cmd">tail -f <span class="arg">career.log</span></p>
+                <ol class="timeline">
+                    <li class="timeline-item">
+                        <p class="timeline-role" data-es="Desarrollador Full Stack &amp; Encargado de Ciberseguridad"
+                            data-en="Full Stack Developer &amp; Cybersecurity Lead">Desarrollador Full Stack &amp;
+                            Encargado de Ciberseguridad</p>
+                        <p class="timeline-meta"><span class="co">Grupo Crater</span> · <span
+                                data-es="ago 2025 — actualmente" data-en="aug 2025 — present">ago 2025 —
+                                actualmente</span></p>
+                        <ul>
+                            <li data-es="Desarrollo y mantenimiento de aplicaciones web full stack"
+                                data-en="Full stack web application development and maintenance">Desarrollo y
+                                mantenimiento de aplicaciones web full stack</li>
+                            <li data-es="Gestión y auditoría de ciberseguridad e infraestructura"
+                                data-en="Cybersecurity management and infrastructure auditing">Gestión y auditoría de
+                                ciberseguridad e infraestructura</li>
+                            <li data-es="Manejo y despliegue de contenedores con Docker y Kubernetes"
+                                data-en="Container management and deployment with Docker and Kubernetes">Manejo y
+                                despliegue de contenedores con Docker y Kubernetes</li>
+                        </ul>
+                    </li>
+                    <li class="timeline-item">
+                        <p class="timeline-role" data-es="Frontend Dev — CGSU (UDG)"
+                            data-en="Frontend Dev — CGSU (UDG)">
+                            Frontend Dev — CGSU (UDG)</p>
+                        <p class="timeline-meta"><span class="co">Universidad de Guadalajara</span> · <span
+                                data-es="sep 2025 — abr 2026" data-en="sep 2025 — apr 2026">sep 2025 — abr
+                                2026</span></p>
+                        <ul>
+                            <li data-es="Diseño y desarrollo de interfaces de usuario"
+                                data-en="User interface design and development">Diseño y desarrollo de interfaces de
+                                usuario</li>
+                            <li data-es="Implementación de funcionalidades interactivas"
+                                data-en="Implementation of interactive features">Implementación de funcionalidades
+                                interactivas</li>
+                            <li data-es="Implementación de Llama (Meta IA) como chatbot"
+                                data-en="Implementation of Llama (Meta AI) as a chatbot">Implementación de Llama (Meta
+                                IA) como chatbot</li>
+                        </ul>
+                    </li>
+                    <li class="timeline-item">
+                        <p class="timeline-role" data-es="Desarrollador Freelance (ERP)"
+                            data-en="Freelance ERP Developer">
+                            Desarrollador Freelance (ERP)</p>
+                        <p class="timeline-meta"><span class="co">Copymart</span></p>
+                        <ul>
+                            <li data-es="Desarrollo integral de sistema ERP en Laravel para gestión empresarial"
+                                data-en="Full development of an ERP system in Laravel for enterprise management">
+                                Desarrollo integral de sistema ERP en Laravel para gestión empresarial</li>
+                            <li data-es="Manejo total de flujos de trabajo: comercial, operaciones, RR.HH. y administración"
+                                data-en="Complete management of business workflows: commercial, operations, HR and administration">
+                                Manejo total de flujos de trabajo: comercial, operaciones, RR.HH. y administración
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="timeline-item">
+                        <p class="timeline-role" data-es="Técnico de Campo" data-en="Field Technician">Técnico de Campo
+                        </p>
+                        <p class="timeline-meta"><span class="co">Carcam</span> · jun 2024 — ene 2025</p>
+                        <ul>
+                            <li data-es="Instalación y configuración de domótica"
+                                data-en="Installation and configuration of home automation">Instalación y
+                                configuración de domótica</li>
+                            <li data-es="Instalación y configuración de pantallas de gran formato"
+                                data-en="Installation and configuration of large format displays">Instalación y
+                                configuración de pantallas de gran formato</li>
+                            <li data-es="Liderazgo de equipo técnico" data-en="Technical team leadership">Liderazgo
+                                de equipo técnico</li>
+                            <li data-es="Atención a clientes (soporte técnico)"
+                                data-en="Customer service (technical support)">Atención a clientes (soporte
+                                técnico)</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </section>
 
-                <div class="project-card">
-                    <div class="project-header">
-                        <h3 data-es="Gestión de salas de estudio" data-en="Study Room Management">Gestión de salas de
-                            estudio</h3>
-                        <span class="project-status" data-es="COMPLETADO" data-en="COMPLETED">COMPLETADO</span>
-                    </div>
-                    <p class="project-desc"
-                        data-es="Sistema de reservas y administración de salas de estudio en bibliotecas universitarias. Incluye autenticación, gestión de horarios y notificaciones."
-                        data-en="Reservation and management system for university library study rooms. Includes authentication, schedule management, and notifications.">
-                        Sistema de reservas y administración de salas de estudio en bibliotecas universitarias. Incluye
-                        autenticación, gestión de horarios y notificaciones.
-                    </p>
-                    <div class="project-tags">
-                        <span class="tag">Node.js</span>
-                        <span class="tag">Express.js</span>
-                        <span class="tag">MySQL</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/ju4d/Biblio-Tec/blob/main/README.md" class="project-link">GitHub →</a>
-                    </div>
+        <!-- chapter 3: arsenal -->
+        <section class="term">
+            <div class="term-bar">
+                <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+                <span class="term-path">~/cv/skills.sh</span>
+            </div>
+            <div class="term-body">
+                <p class="cmd">./skills.sh <span class="arg">--scan</span></p>
+                <div id="meters">
+                    <div class="meter-row" data-skill="70"><span class="meter-label" data-es="SYS admin"
+                            data-en="Server Setup &amp; Management from Scratch">SYS admin </span><span
+                            class="meter-bar"></span><span class="meter-pct">70%</span></div>
+                    <div class="meter-row" data-skill="75"><span class="meter-label">Docker / Kubernetes</span><span
+                            class="meter-bar"></span><span class="meter-pct">75%</span></div>
+                    <div class="meter-row" data-skill="70"><span class="meter-label">JavaScript / TypeScript</span><span
+                            class="meter-bar"></span><span class="meter-pct">70%</span></div>
+                    <div class="meter-row" data-skill="65"><span class="meter-label">React / Next.js</span><span
+                            class="meter-bar"></span><span class="meter-pct">65%</span></div>
+                    <div class="meter-row" data-skill="90"><span class="meter-label">Node.js / Express</span><span
+                            class="meter-bar"></span><span class="meter-pct">90%</span></div>
+                    <div class="meter-row" data-skill="60"><span class="meter-label">Python / Django</span><span
+                            class="meter-bar"></span><span class="meter-pct">60%</span></div>
+                    <div class="meter-row" data-skill="85"><span class="meter-label">Laravel / PHP</span><span
+                            class="meter-bar"></span><span class="meter-pct">85%</span></div>
+                    <div class="meter-row" data-skill="75"><span class="meter-label" data-es="BD (MySQL, PostgreSQL)"
+                            data-en="DB (MySQL, PostgreSQL)">BD (MySQL, PostgreSQL)</span><span
+                            class="meter-bar"></span><span class="meter-pct">75%</span></div>
+                    <div class="meter-row" data-skill="85"><span class="meter-label">Linux</span><span
+                            class="meter-bar"></span><span class="meter-pct">85%</span></div>
+                    <div class="meter-row" data-skill="60"><span class="meter-label">C / C++ / C#</span><span
+                            class="meter-bar"></span><span class="meter-pct">60%</span></div>
                 </div>
+            </div>
+        </section>
 
-                <div class="project-card">
-                    <div class="project-header">
-                        <h3 data-es="Catálogo de bicicletas" data-en="Bicycle Catalog">Catálogo de bicicletas</h3>
-                        <span class="project-status" data-es="COMPLETADO" data-en="COMPLETED">COMPLETADO</span>
+        <!-- chapter 4: field notes -->
+        <section class="term">
+            <div class="term-bar">
+                <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+                <span class="term-path">~/cv/projects</span>
+            </div>
+            <div class="term-body">
+                <p class="cmd">ls -la <span class="arg">./projects</span></p>
+                <div class="projects-grid">
+                    <div class="project">
+                        <div class="project-head">
+                            <h3 data-es="Gestión de desperdicios e inventario (Tlaix)"
+                                data-en="Waste &amp; Inventory Management (Tlaix)">Gestión de desperdicios e
+                                inventario (Tlaix)</h3>
+                            <span class="flag active" data-es="ACTIVO" data-en="ACTIVE">ACTIVO</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Gestiona inventario y desperdicio de restaurantes y buffets: seguimiento, reportes, analíticas y predicciones de consumo con IA."
+                            data-en="Manages inventory and waste for restaurants and buffets: tracking, reporting, analytics and AI-powered consumption predictions.">
+                            Gestiona inventario y desperdicio de restaurantes y buffets: seguimiento, reportes,
+                            analíticas y predicciones de consumo con IA.</p>
+                        <div class="project-tags"><span class="tag">Laravel Blade</span><span class="tag">IBM
+                                Cloud</span><span class="tag">MySQL</span></div>
+                        <a href="https://github.com/ju4d/Tlaix-v2" class="project-link" target="_blank"
+                            rel="noopener">github →</a>
                     </div>
-                    <p class="project-desc"
-                        data-es="Aplicación web para la gestión y visualización de un catálogo de bicicletas. Funcionalidades incluyen búsqueda, filtrado y detalles de productos."
-                        data-en="Web application for managing and displaying a bicycle catalog. Features include search, filtering, and product details.">
-                        Aplicación web para la gestión y visualización de un catálogo de bicicletas. Funcionalidades
-                        incluyen búsqueda, filtrado y detalles de productos.
-                    </p>
-                    <div class="project-tags">
-                        <span class="tag">Laravel Blade (PHP)</span>
-                        <span class="tag">MySQL</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/ju4d/Bike-catalog" class="project-link">GitHub →</a>
-                    </div>
-                </div>
 
-                <div class="project-card">
-                    <div class="project-header">
-                        <h3>Web Crawler</h3>
-                        <span class="project-status" data-es="COMPLETADO" data-en="COMPLETED">COMPLETADO</span>
+                    <div class="project">
+                        <div class="project-head">
+                            <h3 data-es="Becas PEES (UDG)" data-en="PEES Scholarships (UDG)">Becas PEES (UDG)</h3>
+                            <span class="flag active" data-es="ACTIVO" data-en="ACTIVE">ACTIVO</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Plataforma para gestión integral de becas estudiantiles: solicitud, seguimiento, administración y un chatbot de IA para recomendaciones."
+                            data-en="Platform for end-to-end scholarship management: application, tracking, administration, and an AI chatbot for recommendations.">
+                            Plataforma para gestión integral de becas estudiantiles: solicitud, seguimiento,
+                            administración y un chatbot de IA para recomendaciones.</p>
+                        <div class="project-tags"><span class="tag">React</span><span class="tag">PHP</span><span
+                                class="tag">Llama (Meta AI)</span></div>
+                        <a href="https://github.com/EduardoGMora/BecasCGSU-Back" class="project-link" target="_blank"
+                            rel="noopener">github →</a>
                     </div>
-                    <p class="project-desc"
-                        data-es="Herramienta de web scraping para extraer cupones y almacenarlos en un JSON. Con base en la información ingresada por el usuario. Esto utilizando Python y BeautifulSoup."
-                        data-en="Web scraping tool to extract coupons and store them in JSON format. Based on user-provided information. Built using Python and BeautifulSoup.">
-                        Herramienta de web scraping para extraer cupones y almacenarlos en un JSON. Con base en la
-                        información ingresada por el usuario. Esto utilizando Python y BeautifulSoup.
-                    </p>
-                    <div class="project-tags">
-                        <span class="tag">Python</span>
-                        <span class="tag">BeautifulSoup</span>
+
+                    <div class="project">
+                        <div class="project-head">
+                            <h3 data-es="Gestión de salas de estudio" data-en="Study Room Management">Gestión de
+                                salas de estudio</h3>
+                            <span class="flag" data-es="COMPLETADO" data-en="DONE">COMPLETADO</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Reservas y administración de salas de estudio en bibliotecas universitarias, con autenticación y notificaciones."
+                            data-en="Reservation and management system for university library study rooms, with authentication and notifications.">
+                            Reservas y administración de salas de estudio en bibliotecas universitarias, con
+                            autenticación y notificaciones.</p>
+                        <div class="project-tags"><span class="tag">Node.js</span><span
+                                class="tag">Express.js</span><span class="tag">MySQL</span></div>
+                        <a href="https://github.com/ju4d/Biblio-Tec/blob/main/README.md" class="project-link"
+                            target="_blank" rel="noopener">github →</a>
                     </div>
-                    <div class="project-links">
-                        <a href="https://github.com/ju4d/Web-crawler" class="project-link">GitHub →</a>
+
+                    <div class="project">
+                        <div class="project-head">
+                            <h3 data-es="Checar (Gestión de Vehículos & Flotillas)"
+                                data-en="Checar (Vehicle & Fleet Management)">
+                                Checar (Gestión de Vehículos & Flotillas)</h3>
+                            <span class="flag active" data-es="PRODUCCIÓN" data-en="LIVE">PRODUCCIÓN</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Sistema web para el control integral de mantenimientos y servicios de uno o varios vehículos hasta flotillas según las necesidades del cliente."
+                            data-en="Web platform for comprehensive service and maintenance tracking of individual vehicles to enterprise fleets.">
+                            Sistema web para el control integral de mantenimientos y servicios de uno o varios vehículos
+                            hasta flotillas según las necesidades del cliente.</p>
+                        <div class="project-tags"><span class="tag">Plataforma Web</span><span class="tag">Gestión de
+                                Flotillas</span><span class="tag">Control de Servicios</span></div>
+                        <a href="https://checar.com.mx" class="project-link" target="_blank"
+                            rel="noopener">checar.com.mx →</a>
+                    </div>
+
+                    <div class="project">
+                        <div class="project-head">
+                            <h3>Web Crawler</h3>
+                            <span class="flag" data-es="COMPLETADO" data-en="DONE">COMPLETADO</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Scraping para extraer cupones y guardarlos en JSON según lo que ingresa el usuario, con Python y BeautifulSoup."
+                            data-en="Scraping tool that extracts coupons into JSON based on user input, built with Python and BeautifulSoup.">
+                            Scraping para extraer cupones y guardarlos en JSON según lo que ingresa el usuario, con
+                            Python y BeautifulSoup.</p>
+                        <div class="project-tags"><span class="tag">Python</span><span class="tag">BeautifulSoup</span>
+                        </div>
+                        <a href="https://github.com/ju4d/Web-crawler" class="project-link" target="_blank"
+                            rel="noopener">github →</a>
+                    </div>
+
+                    <div class="project">
+                        <div class="project-head">
+                            <h3 data-es="Sistema ERP Empresarial (Copymart)" data-en="Enterprise ERP System (Copymart)">
+                                Sistema ERP Empresarial (Copymart)</h3>
+                            <span class="flag" data-es="COMPLETADO" data-en="DONE">COMPLETADO</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="ERP a medida para Copymart: automatiza comercial, operaciones, RR.HH. y administración en un solo flujo."
+                            data-en="Custom ERP for Copymart: automates commercial, operations, HR and admin in a single workflow.">
+                            ERP a medida para Copymart: automatiza comercial, operaciones, RR.HH. y administración en
+                            un solo flujo.</p>
+                        <div class="project-tags"><span class="tag">Laravel</span><span class="tag">MySQL</span><span
+                                class="tag">ERP</span></div>
+                    </div>
+
+                    <div class="project">
+                        <div class="project-head">
+                            <h3 data-es="Sistema de Fidelidad" data-en="Loyalty Program System">
+                                Sistema de Fidelidad</h3>
+                            <span class="flag active" data-es="PRODUCCIÓN" data-en="LIVE">PRODUCCIÓN</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Plataforma de fidelización multiusuario y multiempresa con planes de personalización configurables y sistema de recompensas."
+                            data-en="Multi-tenant loyalty program system with customizable branding, plan tiers, and rewards management.">
+                            Plataforma de fidelización multiusuario y multiempresa con planes de personalización
+                            configurables y sistema de recompensas.</p>
+                        <div class="project-tags"><span class="tag">Plataforma Web</span><span
+                                class="tag">Multi-tenant</span><span class="tag">SaaS</span></div>
+                        <a href="https://sistemadepuntos.com" class="project-link" target="_blank"
+                            rel="noopener">sistemadepuntos.com →</a>
+                    </div>
+
+                    <div class="project">
+                        <div class="project-head">
+                            <h3 data-es="Vaenzracing (E-commerce)" data-en="Vaenzracing (E-commerce)">
+                                Vaenzracing (E-commerce)</h3>
+                            <span class="flag active" data-es="PRODUCCIÓN" data-en="LIVE">PRODUCCIÓN</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Tienda y catálogo en línea de partes de motocicleta con +14,000 productos extraídos mediante web scraping de la plataforma anterior del cliente."
+                            data-en="Online motorcycle parts catalog and e-commerce featuring 14k+ products scraped from the client's legacy site.">
+                            Tienda y catálogo en línea de partes de motocicleta con +14,000 productos extraídos mediante
+                            web scraping de la plataforma anterior del cliente.</p>
+                        <div class="project-tags"><span class="tag">E-commerce</span><span class="tag">Web
+                                Scraping</span><span class="tag">Python</span></div>
+                        <a href="https://www.vaenzracing.com/" class="project-link" target="_blank"
+                            rel="noopener">vaenzracing.com →</a>
+                    </div>
+
+                    <div class="project">
+                        <div class="project-head">
+                            <h3 data-es="Mgtex (E-commerce & POS)" data-en="Mgtex (E-commerce & POS)">
+                                Mgtex (E-commerce & POS)</h3>
+                            <span class="flag active" data-es="PRODUCCIÓN" data-en="LIVE">PRODUCCIÓN</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Tienda en línea con integración y sincronización directa con punto de venta (POS) físico."
+                            data-en="Online store integrated with physical Point of Sale (POS) system for real-time inventory and sales sync.">
+                            Tienda en línea con integración y sincronización directa con punto de venta (POS) físico.
+                        </p>
+                        <div class="project-tags"><span class="tag">E-commerce</span><span class="tag">Integración
+                                POS</span></div>
+                        <a href="https://mgtex.mx/" class="project-link" target="_blank" rel="noopener">mgtex.mx →</a>
+                    </div>
+
+                    <div class="project full-width">
+                        <div class="project-head">
+                            <h3 data-es="Múltiples Proyectos Privados (Uso Interno Empresarial)"
+                                data-en="Multiple Private Projects (Internal Enterprise Use)">
+                                Múltiples Proyectos Privados (Uso Interno Empresarial)</h3>
+                            <span class="flag" data-es="PRIVADO / INTERNO" data-en="PRIVATE / INTERNAL">PRIVADO /
+                                INTERNO</span>
+                        </div>
+                        <p class="project-desc"
+                            data-es="Desarrollo de múltiples sistemas privados e internos a medida para empresas, incluyendo plataformas de Atención al Cliente (SAC), Planeación de Recursos Empresariales (ERP), Gestión de Relaciones con Clientes (CRM) y Puntos de Venta (POS)."
+                            data-en="Development of multiple custom private and internal enterprise systems under NDA, including Customer Support (SAC), Enterprise Resource Planning (ERP), Customer Relationship Management (CRM), and Point of Sale (POS) platforms.">
+                            Desarrollo de múltiples sistemas privados e internos a medida para empresas, incluyendo
+                            plataformas de Atención al Cliente (SAC), Planeación de Recursos Empresariales (ERP),
+                            Gestión de Relaciones con Clientes (CRM) y Puntos de Venta (POS).</p>
+                        <div class="project-tags"><span class="tag">SAC</span><span class="tag">ERP</span><span
+                                class="tag">CRM</span><span class="tag">Puntos de Venta (POS)</span><span
+                                class="tag">Sistemas Internos</span><span class="tag">NDA</span></div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="neon-border">
-            <h2 data-es="// Experiencia" data-en="// Experience">// Experiencia</h2>
-            <div class="section-grid">
-                <div class="info-card">
-                    <h3 data-es="Técnico de campo" data-en="Field Technician">Técnico de campo</h3>
-                    <p><strong>Carcam</strong> | 01/06/2024 - 01/01/2025</p>
-                    <ul>
-                        <li data-es="Instalación y configuración de domótica"
-                            data-en="Installation and configuration of home automation">Instalación y configuración de
-                            domótica</li>
-                        <li data-es="Instalación y configuración de pantallas de gran formato"
-                            data-en="Installation and configuration of large format displays">Instalación y
-                            configuración de pantallas de gran formato</li>
-                        <li data-es="Liderazgo de equipo técnico" data-en="Technical team leadership">Liderazgo de
-                            equipo técnico</li>
-                        <li data-es="Atención a clientes (soporte técnico)"
-                            data-en="Customer service (technical support)">Atención a clientes (soporte técnico)</li>
-                    </ul>
-                </div>
-                <div class="info-card">
-                    <h3 data-es="Frontend-Dev CGSU (UDG)" data-en="Frontend-Dev CGSU (UDG)">Frontend-Dev CGSU (UDG)</h3>
-                    <p  data-es="01/09/2025 - Actualmente" data-en="01/09/2025 - Now"><strong>01/09/2025 - Actualmente</strong></p>
-                    <ul>
-                        <li data-es="Diseño y desarrollo de interfaces de usuario"
-                            data-en="User interface design and development">Diseño y desarrollo de interfaces de usuario</li>
-                        <li data-es="Implementación de funcionalidades interactivas"
-                            data-en="Implementation of interactive features">Implementación de funcionalidades interactivas</li>
-                        <li data-es="Implementacion de llama (Meta IA) como chatbot" data-en="Implementation of Llama (Meta AI) as a chatbot">Implementacion de llama (Meta IA) como chatbot</li>
-                    </ul>
-                </div>
+        <!-- chapter 5: origins -->
+        <section class="term">
+            <div class="term-bar">
+                <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+                <span class="term-path">~/cv/education.log</span>
             </div>
-        </div>
-
-        <div class="neon-border">
-            <h2 data-es="// Habilidades" data-en="// Skills">// Habilidades</h2>
-            <div>
-                <div class="skill-bar" data-skill="70">
-                    <span class="skill-label">JavaScript / TypeScript</span>
-                </div>
-                <div class="skill-bar" data-skill="65">
-                    <span class="skill-label">React / Next.js</span>
-                </div>
-                <div class="skill-bar" data-skill="90">
-                    <span class="skill-label">Node.js / Express</span>
-                </div>
-                <div class="skill-bar" data-skill="60">
-                    <span class="skill-label">Python / Django</span>
-                </div>
-                <div class="skill-bar" data-skill="85">
-                    <span class="skill-label">Laravel / PHP</span>
-                </div>
-                <div class="skill-bar" data-skill="75">
-                    <span class="skill-label" data-es="Bases de datos (MySQL, PostgreSQL)"
-                        data-en="Databases (MySQL, PostgreSQL)">Bases de datos (MySQL, PostgreSQL)</span>
-                </div>
-                <div class="skill-bar" data-skill="85">
-                    <span class="skill-label">Linux</span>
-                </div>
-                <div class="skill-bar" data-skill="60">
-                    <span class="skill-label">C / C++ / C#</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="neon-border">
-            <h2 data-es="// Educación" data-en="// Education">// Educación</h2>
-            <div class="section-grid">
-                <div class="info-card">
+            <div class="term-body">
+                <p class="cmd">cat <span class="arg">education.log</span></p>
+                <div class="edu-item">
                     <h3 data-es="Ingeniería Informática" data-en="Computer Engineering">Ingeniería Informática</h3>
-                    <p><strong data-es="Universidad de Guadalajara" data-en="University of Guadalajara">Universidad de
-                            Guadalajara</strong></p>
-                    <p>2019 - 2025</p>
+                    <p class="co" data-es="Universidad de Guadalajara" data-en="University of Guadalajara">
+                        Universidad de Guadalajara</p>
+                    <p class="yr">2019 — 2025</p>
                 </div>
-
-                <div class="info-card">
+                <div class="edu-item">
                     <h3 data-es="Certificaciones" data-en="Certifications">Certificaciones</h3>
                     <ul>
-                        <li data-es="Cisco CCNA Netacademy (introducción a redes)"
-                            data-en="Cisco CCNA Netacademy (introduction to networks)">Cisco CCNA Netacademy
+                        <li data-es="Cisco CCNA NetAcademy (introducción a redes)"
+                            data-en="Cisco CCNA NetAcademy (intro to networking)">Cisco CCNA NetAcademy
                             (introducción a redes)</li>
-                        <li data-es="Hack the Box (Máquinas resueltas y en proceso)"
-                            data-en="Hack the Box (Solved and ongoing machines)">Hack the Box (Máquinas resueltas y en
-                            proceso)</li>
+                        <li data-es="Hack The Box — máquinas resueltas y en proceso"
+                            data-en="Hack The Box — solved and ongoing machines">Hack The Box — máquinas resueltas y
+                            en proceso</li>
                         <li>IEP (Design Thinking)</li>
                     </ul>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="neon-border">
-            <h2 data-es="// Sobre Mí" data-en="// About Me">// Sobre Mí</h2>
-            <p style="color: #a8b2d1; font-size: 1.2rem; line-height: 1.8;"
-                data-es="Estudiante de Ingeniería Informática con gran interés en la ciberseguridad, el análisis de datos y el desarrollo de backend. Experiencia práctica en laboratorios de pruebas de pentesting (HackTheBox, TryHackMe), programación en Python para la automatización y el análisis de datos, y creación de API de backend. Manejo avanzado en sistemas Linux, redes y programación, con una mentalidad proactiva y un compromiso con el aprendizaje continuo. Busco un puesto de nivel inicial como analista de seguridad, desarrollador de backend o analista de datos, en el que pueda aplicar mis habilidades técnicas para resolver problemas y reforzar la fiabilidad de los sistemas."
-                data-en="Computer Engineering student with a strong interest in cybersecurity, data analysis, and backend development. Practical experience in pentesting labs (HackTheBox, TryHackMe), Python programming for automation and data analysis, and backend API development. Advanced knowledge in Linux systems, networking, and programming, with a proactive mindset and commitment to continuous learning. Seeking an entry-level position as a security analyst, backend developer, or data analyst where I can apply my technical skills to solve problems and strengthen system reliability.">
-                Estudiante de Ingeniería Informática con gran interés en la ciberseguridad, el análisis de datos y el
-                desarrollo de backend. Experiencia práctica en laboratorios de pruebas de pentesting (HackTheBox,
-                TryHackMe), programación en Python para la automatización y el análisis de datos, y creación de API de
-                backend. Manejo avanzado en sistemas Linux, redes y programación, con una mentalidad proactiva y un
-                compromiso con el aprendizaje continuo. Busco un puesto de nivel inicial como analista de seguridad,
-                desarrollador de backend o analista de datos, en el que pueda aplicar mis habilidades técnicas para
-                resolver problemas y reforzar la fiabilidad de los sistemas.
-            </p>
-        </div>
-
-        <div class="neon-border">
-            <h2 data-es="// Contacto" data-en="// Contact">// Contacto</h2>
-            <div class="contact-grid">
-                <div class="contact-item">
-                    <a>juan.rodriguez.zar@gmail.com</a>
-                </div>
-                <div class="contact-item">
-                    <a href="https://github.com/ju4d" target="_blank">GitHub</a>
-                </div>
-                <div class="contact-item">
-                    <a href="https://www.linkedin.com/in/ju4d" target="_blank">LinkedIn</a>
-                </div>
-                <div class="contact-item">
-                    <a data-es="Tel: +52 352-116-5602" data-en="Tel: +52 352-116-5602">Tel: +52 352-116-5602</a>
+        <!-- chapter 6: contact -->
+        <section class="term">
+            <div class="term-bar">
+                <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+                <span class="term-path">~/cv/contact</span>
+            </div>
+            <div class="term-body">
+                <p class="cmd">contact <span class="arg">--handshake</span></p>
+                <div class="contact-lines">
+                    <div class="contact-line"><span class="contact-key">email</span><a
+                            href="mailto:juan.rodriguez.zar@gmail.com">juan.rodriguez.zar@gmail.com</a></div>
+                    <div class="contact-line"><span class="contact-key">github</span><a href="https://github.com/ju4d"
+                            target="_blank" rel="noopener">github.com/ju4d</a></div>
+                    <div class="contact-line"><span class="contact-key">linkedin</span><a
+                            href="https://www.linkedin.com/in/ju4d" target="_blank"
+                            rel="noopener">linkedin.com/in/ju4d</a></div>
+                    <div class="contact-line"><span class="contact-key">tel</span><a href="tel:+523521165602">+52 352
+                            116 5602</a></div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <footer>~ end of file ~</footer>
     </div>
 
     <script>
-        let currentLang = 'es';
+        (function () {
+            'use strict';
 
-        function changeLanguage(lang) {
-            currentLang = lang;
+            /* ---------------- language switch ---------------- */
+            function changeLanguage(lang, btn) {
+                document.querySelectorAll('.lang-btn').forEach(function (b) { b.classList.remove('active'); });
+                if (btn) btn.classList.add('active');
 
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
+                document.querySelectorAll('[data-es][data-en]').forEach(function (el) {
+                    var text = el.getAttribute('data-' + lang);
+                    if (text) el.textContent = text;
+                });
+                document.documentElement.lang = lang;
+            }
+            document.querySelectorAll('.lang-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () { changeLanguage(btn.dataset.lang, btn); });
             });
-            event.target.classList.add('active');
 
-            document.querySelectorAll('[data-es][data-en]').forEach(element => {
-                const text = element.getAttribute(`data-${lang}`);
-                if (text) {
-                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                        element.placeholder = text;
-                    } else {
-                        element.textContent = text;
+            /* ---------------- ascii skill meters ---------------- */
+            var BAR_LEN = 22;
+            document.querySelectorAll('.meter-row').forEach(function (row) {
+                var pct = parseInt(row.dataset.skill, 10) || 0;
+                var filled = Math.round((pct / 100) * BAR_LEN);
+                var bar = row.querySelector('.meter-bar');
+                bar.innerHTML = '[<span class="fill">' + '█'.repeat(filled) + '</span>' +
+                    '░'.repeat(BAR_LEN - filled) + ']';
+            });
+
+            /* ---------------- scroll reveal for terminal chapters ---------------- */
+            var terms = document.querySelectorAll('.term');
+            if ('IntersectionObserver' in window) {
+                var revealObserver = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('in-view');
+                            revealObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.12 });
+                terms.forEach(function (t) { revealObserver.observe(t); });
+            } else {
+                terms.forEach(function (t) { t.classList.add('in-view'); });
+            }
+
+            /* ---------------- tiny raymarched shader -> ascii render ---------------- */
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var stage = document.getElementById('asciiStage');
+            var canvas = document.getElementById('asciiCanvas');
+            if (!stage || !canvas) return;
+
+            var RAMP = ' .:-=+*#%@';
+            var FONT_SIZE = 10;
+            var CHAR_W = 6;
+            var CHAR_H = 12;
+            var MAX_COLS = 92;
+            var MAX_ROWS = 22;
+
+            var gl, glCanvas, program, uTime, uRes, cols, rows, pixelBuf;
+            var ctx2d = canvas.getContext('2d');
+
+            function compileShader(gl, type, src) {
+                var s = gl.createShader(type);
+                gl.shaderSource(s, src);
+                gl.compileShader(s);
+                if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                    throw new Error(gl.getShaderInfoLog(s));
+                }
+                return s;
+            }
+
+            var VERT = 'attribute vec2 aPos;' +
+                'void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }';
+
+            var FRAG =
+                'precision mediump float;' +
+                'uniform vec2 uRes;' +
+                'uniform float uTime;' +
+                'float terrain(vec2 p){' +
+                '  return sin(p.x*1.6 + uTime*1.1)*0.16' +
+                '       + sin(p.y*1.15 - uTime*0.7)*0.16' +
+                '       + sin((p.x+p.y)*0.7 + uTime*0.45)*0.09;' +
+                '}' +
+                'float map(vec3 p){ return p.y - terrain(p.xz); }' +
+                'vec3 calcNormal(vec3 p){' +
+                '  float e = 0.06;' +
+                '  float hL = terrain(p.xz - vec2(e, 0.0));' +
+                '  float hR = terrain(p.xz + vec2(e, 0.0));' +
+                '  float hD = terrain(p.xz - vec2(0.0, e));' +
+                '  float hU = terrain(p.xz + vec2(0.0, e));' +
+                '  return normalize(vec3(hL - hR, 2.0*e, hD - hU));' +
+                '}' +
+                'void main(){' +
+                '  vec2 uv = (gl_FragCoord.xy - 0.5*uRes) / uRes.y;' +
+                '  vec3 ro = vec3(0.0, 1.5, -1.6);' +
+                '  vec3 rd = normalize(vec3(uv.x*1.5, uv.y*0.6 - 0.32, 1.0));' +
+                '  float t = 0.0;' +
+                '  bool hit = false;' +
+                '  for(int i=0;i<44;i++){' +
+                '    vec3 p = ro + rd*t;' +
+                '    float d = map(p);' +
+                '    if(abs(d) < 0.012){ hit = true; break; }' +
+                '    t += d*0.55;' +
+                '    if(t > 11.0) break;' +
+                '  }' +
+                '  float b = 0.0;' +
+                '  if(hit){' +
+                '    vec3 p = ro + rd*t;' +
+                '    vec3 n = calcNormal(p);' +
+                '    vec3 lightDir = normalize(vec3(0.5, 0.7, -0.3));' +
+                '    float diff = max(dot(n, lightDir), 0.0);' +
+                '    float rim = pow(1.0 - max(dot(n, vec3(0.0,1.0,0.0)), 0.0), 3.0);' +
+                '    b = diff*0.75 + rim*0.3 + 0.08;' +
+                '    b *= exp(-t*0.11);' +
+                '  }' +
+                '  gl_FragColor = vec4(vec3(b), 1.0);' +
+                '}';
+
+            function initGL() {
+                glCanvas = document.createElement('canvas');
+                gl = glCanvas.getContext('webgl', { alpha: false, antialias: false, preserveDrawingBuffer: true }) ||
+                    glCanvas.getContext('experimental-webgl');
+                if (!gl) throw new Error('no webgl');
+
+                var vs = compileShader(gl, gl.VERTEX_SHADER, VERT);
+                var fs = compileShader(gl, gl.FRAGMENT_SHADER, FRAG);
+                program = gl.createProgram();
+                gl.attachShader(program, vs);
+                gl.attachShader(program, fs);
+                gl.linkProgram(program);
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    throw new Error(gl.getProgramInfoLog(program));
+                }
+                gl.useProgram(program);
+
+                var buf = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+                var aPos = gl.getAttribLocation(program, 'aPos');
+                gl.enableVertexAttribArray(aPos);
+                gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+                uTime = gl.getUniformLocation(program, 'uTime');
+                uRes = gl.getUniformLocation(program, 'uRes');
+            }
+
+            function layout() {
+                var w = Math.min(stage.clientWidth || 600, 760);
+                var h = window.innerWidth < 600 ? 110 : 170;
+                cols = Math.max(20, Math.min(MAX_COLS, Math.floor(w / CHAR_W)));
+                rows = Math.max(8, Math.min(MAX_ROWS, Math.floor(h / CHAR_H)));
+
+                glCanvas.width = cols;
+                glCanvas.height = rows;
+                gl.viewport(0, 0, cols, rows);
+
+                canvas.width = cols * CHAR_W;
+                canvas.height = rows * CHAR_H;
+                canvas.style.width = (cols * CHAR_W) + 'px';
+                canvas.style.height = (rows * CHAR_H) + 'px';
+
+                pixelBuf = new Uint8Array(cols * rows * 4);
+                ctx2d.font = FONT_SIZE + 'px "JetBrains Mono", monospace';
+                ctx2d.textBaseline = 'top';
+            }
+
+            function drawFrame(timeSec) {
+                gl.uniform2f(uRes, cols, rows);
+                gl.uniform1f(uTime, timeSec);
+                gl.drawArrays(gl.TRIANGLES, 0, 3);
+                gl.readPixels(0, 0, cols, rows, gl.RGBA, gl.UNSIGNED_BYTE, pixelBuf);
+
+                ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+                for (var row = 0; row < rows; row++) {
+                    var srcRow = rows - 1 - row; // flip: webgl origin is bottom-left
+                    for (var col = 0; col < cols; col++) {
+                        var idx = (srcRow * cols + col) * 4;
+                        var lum = pixelBuf[idx] / 255;
+                        if (lum < 0.03) continue;
+                        var rampIdx = Math.min(RAMP.length - 1, Math.floor(lum * RAMP.length));
+                        var ch = RAMP[rampIdx];
+                        if (ch === ' ') continue;
+                        var alpha = 0.35 + lum * 0.65;
+                        ctx2d.fillStyle = lum > 0.72
+                            ? 'rgba(224, 164, 88, ' + alpha + ')'
+                            : 'rgba(127, 230, 168, ' + alpha + ')';
+                        ctx2d.fillText(ch, col * CHAR_W, row * CHAR_H);
                     }
                 }
-            });
+            }
 
-            document.documentElement.lang = lang;
-        }
+            var running = true;
+            var lastFrame = 0;
+            var FRAME_INTERVAL = 1000 / 14;
+
+            function loop(ts) {
+                if (!running) return;
+                requestAnimationFrame(loop);
+                if (ts - lastFrame < FRAME_INTERVAL) return;
+                lastFrame = ts;
+                drawFrame(ts * 0.001);
+            }
+
+            try {
+                initGL();
+                layout();
+
+                if (reduceMotion) {
+                    drawFrame(1.4);
+                } else {
+                    requestAnimationFrame(loop);
+
+                    document.addEventListener('visibilitychange', function () {
+                        running = !document.hidden;
+                        if (running) requestAnimationFrame(loop);
+                    });
+
+                    if ('IntersectionObserver' in window) {
+                        var stageObserver = new IntersectionObserver(function (entries) {
+                            entries.forEach(function (entry) {
+                                running = entry.isIntersecting && !document.hidden;
+                                if (running) requestAnimationFrame(loop);
+                            });
+                        }, { threshold: 0 });
+                        stageObserver.observe(stage);
+                    }
+
+                    var resizeTimer;
+                    window.addEventListener('resize', function () {
+                        clearTimeout(resizeTimer);
+                        resizeTimer = setTimeout(layout, 200);
+                    });
+                }
+            } catch (err) {
+                stage.style.display = 'none';
+            }
+
+            /* ---------------- background ascii tentacles ---------------- */
+            (function () {
+                var tc = document.getElementById('tentacleCanvas');
+                if (!tc) return;
+                var tctx = tc.getContext('2d');
+                if (!tctx) return;
+
+                var TW = 0, TH = 0, DPR = 1;
+                var tentacles = [];
+                var GLYPHS = ['ア', 'カ', 'サ', 'タ', 'ナ', 'ハ', 'マ', 'ヤ', 'ラ', 'ワ', 'ン', 'ニ', 'ヲ', 'ネ', 'モ', 'ロ', 'ル', 'レ', 'ケ', 'セ', 'テ', 'メ', 'ヨ', 'ミ', 'ム', 'ユ', 'ソ', 'キ', 'シ', 'チ'];
+                var TIP_GLYPH = '目';
+                var TENTACLE_FONT = '"Noto Sans JP", "JetBrains Mono", monospace';
+
+                function rand(a, b) { return a + Math.random() * (b - a); }
+
+                function buildTentacles() {
+                    var count = TW < 640 ? 4 : (TW < 1100 ? 6 : 8);
+                    tentacles = [];
+                    for (var i = 0; i < count; i++) {
+                        var t = (i + 0.5) / count;
+                        tentacles.push({
+                            baseX: t * TW + rand(-60, 60),
+                            phase: rand(0, Math.PI * 2),
+                            swaySpeed: rand(0.35, 0.7),
+                            swayFreq: rand(1.1, 2.0),
+                            maxLen: TH * rand(0.3, 0.62),
+                            lenPhase: rand(0, Math.PI * 2),
+                            lenSpeed: rand(0.09, 0.2),
+                            curl: (Math.random() < 0.5 ? -1 : 1) * rand(0.6, 1.3)
+                        });
+                    }
+                }
+
+                function resizeTentacles() {
+                    DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+                    TW = window.innerWidth;
+                    TH = window.innerHeight;
+                    tc.width = TW * DPR;
+                    tc.height = TH * DPR;
+                    tctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+                    buildTentacles();
+                }
+
+                function drawTentacles(time) {
+                    tctx.clearRect(0, 0, TW, TH);
+                    tctx.textAlign = 'center';
+                    tctx.textBaseline = 'middle';
+
+                    for (var ti = 0; ti < tentacles.length; ti++) {
+                        var tn = tentacles[ti];
+                        var lenT = (Math.sin(time * tn.lenSpeed + tn.lenPhase) + 1) / 2;
+                        var len = tn.maxLen * (0.4 + 0.6 * lenT);
+                        var segCount = Math.max(16, Math.round(len / 11));
+                        var prevX = tn.baseX, prevY = TH + 12;
+
+                        for (var s = 1; s <= segCount; s++) {
+                            var f = s / segCount;
+                            var taper = 1 - f; // 1 at the root, 0 at the tip
+                            var y = TH + 12 - f * (len + 30);
+                            var sway = Math.sin(f * tn.swayFreq * Math.PI * 2 - time * tn.swaySpeed + tn.phase) * (f * f) * 70 * tn.curl;
+                            var x = tn.baseX + sway;
+
+                            var angle = Math.atan2(y - prevY, x - prevX);
+                            var isTip = f > 0.9;
+                            var bodyAlpha = 0.42 + 0.3 * taper;
+                            var alpha = isTip ? 0.85 * ((f - 0.9) / 0.1) : bodyAlpha;
+                            var glyph = isTip ? TIP_GLYPH : GLYPHS[(s + ti) % GLYPHS.length];
+
+                            var fontSize = isTip ? 15 : (9 + taper * 30);
+                            var offset = isTip ? 1 : (1 + taper * 16);
+
+                            tctx.font = '700 ' + fontSize.toFixed(1) + 'px ' + TENTACLE_FONT;
+                            tctx.save();
+                            tctx.translate(x, y);
+                            tctx.rotate(angle + Math.PI / 2);
+                            tctx.fillStyle = isTip
+                                ? 'rgba(224, 164, 88, ' + alpha.toFixed(3) + ')'
+                                : 'rgba(127, 230, 168, ' + alpha.toFixed(3) + ')';
+
+                            if (taper > 0.8) {
+                                tctx.fillText(glyph, -offset, 0);
+                                tctx.fillText(glyph, -offset * 0.4, 0);
+                                tctx.fillText(glyph, offset * 0.4, 0);
+                                tctx.fillText(glyph, offset, 0);
+                            } else if (taper > 0.45) {
+                                tctx.fillText(glyph, -offset, 0);
+                                tctx.fillText(glyph, 0, 0);
+                                tctx.fillText(glyph, offset, 0);
+                            } else {
+                                tctx.fillText(glyph, -offset, 0);
+                                tctx.fillText(glyph, offset, 0);
+                            }
+                            tctx.restore();
+
+                            prevX = x; prevY = y;
+                        }
+                    }
+                }
+
+                var tRunning = true;
+                var tLastFrame = 0;
+                var T_FRAME_INTERVAL = 1000 / 20;
+
+                function tLoop(ts) {
+                    if (!tRunning) return;
+                    requestAnimationFrame(tLoop);
+                    if (ts - tLastFrame < T_FRAME_INTERVAL) return;
+                    tLastFrame = ts;
+                    drawTentacles(ts * 0.001);
+                }
+
+                try {
+                    resizeTentacles();
+
+                    if (reduceMotion) {
+                        drawTentacles(2.2);
+                    } else {
+                        requestAnimationFrame(tLoop);
+
+                        document.addEventListener('visibilitychange', function () {
+                            tRunning = !document.hidden;
+                            if (tRunning) requestAnimationFrame(tLoop);
+                        });
+
+                        var tResizeTimer;
+                        window.addEventListener('resize', function () {
+                            clearTimeout(tResizeTimer);
+                            tResizeTimer = setTimeout(resizeTentacles, 200);
+                        });
+                    }
+                } catch (err) {
+                    tc.style.display = 'none';
+                }
+            })();
+        })();
     </script>
 </body>
 
